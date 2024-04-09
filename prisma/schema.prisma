@@ -22,16 +22,30 @@ model Role {
 }
 
 model User {
-  id                String   @id @default(uuid())
-  username          String   @unique
-  email             String   @unique
+  id                String      @id @default(uuid())
+  username          String      @unique
+  email             String      @unique
   password          String
   fullName          String
-  accountIsVerified Boolean  @default(false)
-  emailIsVerified   Boolean  @default(false)
+  eofficeUsername   String?
+  eofficePassword   String?
+  accountIsVerified Boolean     @default(false)
+  emailIsVerified   Boolean     @default(false)
   passwordUpdatedAt DateTime
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  role              Role     @relation(fields: [roleId], references: [id])
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  role              Role        @relation(fields: [roleId], references: [id])
   roleId            String
+  scheduler         Scheduler[]
+}
+
+model Scheduler {
+  scheduler_id Int      @id @default(autoincrement())
+  task_id      String
+  task_time    DateTime
+  task_data    Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
 }
