@@ -51,7 +51,12 @@ exports.rosterPersonnelList = async (req, res, next) => {
 };
 
 exports.generateSchedulersPreview = async (req, res, next) => {
-    const { personnel_number, personnel_name, tab_name: tabName } = req.body;
+    const {
+        personnel_number,
+        personnel_name,
+        tab_name: tabName,
+        random_max_time: randomMaxTime = 8,
+    } = req.body;
 
     const personnelRow = Number(personnel_number) + 3;
     const schedulers = [];
@@ -86,19 +91,21 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                 dateObj.setDate(date);
 
                 if (String(shift).toUpperCase() == "S2") {
+                    const minutes = getRandomMinutes(randomMaxTime);
+
                     const waktuAbsenMasuk = new Date(
                         year,
                         month,
                         date,
                         8,
-                        0,
+                        minutes,
                         0
                     );
 
                     const waktuAbsenPulang = new Date();
                     waktuAbsenPulang.setDate(waktuAbsenMasuk.getDate() + 1);
                     waktuAbsenPulang.setHours(20);
-                    waktuAbsenPulang.setMinutes(0);
+                    waktuAbsenPulang.setMinutes(minutes);
 
                     // console.log(
                     //     `Absen Masuk S2: WITEL - APRIL ${date} 2024 Pukul 8 Malam`
@@ -145,12 +152,14 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                     String(shift).toUpperCase() == "S1" &&
                     (dateObj.getDay() != 0 || dateObj.getDay() != 6)
                 ) {
+                    const minutes = getRandomMinutes(randomMaxTime);
+
                     const waktuAbsenMasuk = new Date(
                         year,
                         month,
                         date,
                         8,
-                        0,
+                        minutes,
                         0
                     );
                     const waktuAbsenPulang = new Date(
@@ -158,7 +167,7 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                         month,
                         date,
                         20,
-                        0,
+                        minutes,
                         0
                     );
                     // console.log(
@@ -204,12 +213,14 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                     String(shift).toUpperCase() == "S1" &&
                     (dateObj.getDay() == 0 || dateObj.getDay() == 6)
                 ) {
+                    const minutes = getRandomMinutes(randomMaxTime);
+
                     const waktuAbsenMasuk = new Date(
                         year,
                         month,
                         date,
                         8,
-                        0,
+                        minutes,
                         0
                     );
                     const waktuAbsenPulang = new Date(
@@ -217,7 +228,7 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                         month,
                         date,
                         20,
-                        0,
+                        minutes,
                         0
                     );
                     // console.log(
@@ -226,7 +237,7 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                     schedulers.push({
                         keterangan_absen: "absen_masuk",
                         lokasi_absen: "WITEL",
-                        tanggal_absen: waktuAbsenPulang,
+                        tanggal_absen: waktuAbsenMasuk,
                         data: {
                             via: "WFO",
                             kondisi: "Sehat",
@@ -356,4 +367,12 @@ function getRandomActivity() {
     ];
     const randIndex = Math.floor(Math.random() * activities.length);
     return activities[randIndex];
+}
+
+function getRandomMinutes(max) {
+    if (max > 60) {
+        return Math.floor(Math.random() * (60 + 1));
+    }
+    const randomMinutes = Math.floor(Math.random() * (max + 1));
+    return randomMinutes;
 }
