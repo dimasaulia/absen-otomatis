@@ -322,7 +322,12 @@ exports.setSchedulers = async (req, res, next) => {
                 });
 
                 bulkData.push({
-                    task_data: scheduleData,
+                    task_data: {
+                        keterangan_absen: attandendType,
+                        eofficeUsername: userData.eofficeUsername,
+                        eofficePassword: userData.eofficePassword,
+                        schedulePayload: schedulePayload,
+                    },
                     task_id: taskId,
                     task_time: scheduleDatetime,
                     userId: userData.id,
@@ -354,6 +359,42 @@ exports.setSchedulers = async (req, res, next) => {
         });
     } catch (error) {
         next(error);
+    } finally {
+        await prisma.$disconnect();
+    }
+};
+
+exports.wakeUpSchedulers = async () => {
+    try {
+        const data = await prisma.$queryRaw`
+            SELECT * FROM "Scheduler" s WHERE 
+            EXTRACT(MONTH FROM s.task_time) = EXTRACT(MONTH FROM CURRENT_DATE) 
+            AND EXTRACT(YEAR FROM s.task_time) = EXTRACT(YEAR FROM CURRENT_DATE);
+        `;
+        const currentDate = new Date();
+
+        for (let i = 0; i < data.length; i++) {
+            const scheduleDatetime = new Date(data[i].task_time);
+            const attandendType = data[i].task_data.keterangan_absen;
+            const schedulePayload = data[i].task_data.schedulePayload;
+            const eofficeUsername = data[i].task_data.eofficeUsername;
+            const eofficePassword = data[i].task_data.eofficePassword;
+
+            if (scheduleDatetime > currentDate) {
+                Scheduler.setTask(scheduleDatetime, async () => {
+                    userDoAttandend({
+                        attandendType: attandendType,
+                        attandendData: schedulePayload,
+                        loginData: {
+                            username: eofficeUsername,
+                            passowrd: decryptText(eofficePassword),
+                        },
+                    });
+                });
+            }
+        }
+    } catch (error) {
+        console.log(error);
     } finally {
         await prisma.$disconnect();
     }
