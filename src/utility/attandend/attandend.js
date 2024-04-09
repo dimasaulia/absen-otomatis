@@ -38,4 +38,4 @@ async function userDoAttandend(attandendType, data) {
     }
 }
 
-module.exports = { userDoAttandend };
+module.exports = { userDoAttandend, userDoLogin };

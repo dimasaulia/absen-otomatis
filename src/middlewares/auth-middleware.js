@@ -24,6 +24,8 @@ function logginRequired(req, res, next) {
         );
 
     const payload = verifyAccessToken(token);
+    req.userId = payload.userID;
+    req.username = payload.username;
     next();
 }
 
