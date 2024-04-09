@@ -99,14 +99,14 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                         year,
                         month,
                         date,
-                        8,
+                        20,
                         minutes,
                         0
                     );
 
                     const waktuAbsenPulang = new Date();
                     waktuAbsenPulang.setDate(waktuAbsenMasuk.getDate() + 1);
-                    waktuAbsenPulang.setHours(20);
+                    waktuAbsenPulang.setHours(8);
                     waktuAbsenPulang.setMinutes(minutes);
 
                     // console.log(
@@ -115,15 +115,15 @@ exports.generateSchedulersPreview = async (req, res, next) => {
 
                     schedulers.push({
                         keterangan_absen: "absen_masuk",
-                        lokasi_absen: "SMR",
+                        lokasi_absen: "WITEL",
                         tanggal_absen: waktuAbsenMasuk,
                         data: {
                             via: "WFO",
                             kondisi: "Sehat",
-                            lokasi: "-6.1499495, 106.8880579",
-                            alamat: "Jalan Mitra Sunter Boulevard, RW 11, Sunter Jaya, Tanjung Priok, North Jakarta, Special Capital Region of Jakarta, Java, 14350, Indonesia",
-                            state: "Sunter Jaya",
-                            provinsi: "Special Capital Region of Jakarta",
+                            lokasi: "-6.117492, 106.893084",
+                            alamat: "Transjakarta Busway Koridor 10, 12, RW 06, Kebon Bawang, Tanjung Priok, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14320, Indonesia",
+                            state: "",
+                            provinsi: "Daerah Khusus Jakarta",
                         },
                     });
 
@@ -144,7 +144,7 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                             alamat: "Transjakarta Busway Koridor 10, 12, RW 06, Kebon Bawang, Tanjung Priok, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14320, Indonesia",
                             state: "",
                             provinsi: "Daerah Khusus Jakarta",
-                            aktivitas: getRandomActivity(),
+                            aktivitas: getRandomActivityL2(),
                         },
                     });
                 }
@@ -152,7 +152,7 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                 // Jika Tanngal Absen Adalah WeekDay maka absen masuk di SMR dan Pulang di WItel
                 if (
                     String(shift).toUpperCase() == "S1" &&
-                    (dateObj.getDay() != 0 || dateObj.getDay() != 6)
+                    !(dateObj.getDay() == 0 || dateObj.getDay() == 6)
                 ) {
                     const minutes = getRandomMinutes(randomMaxTime);
 
@@ -205,7 +205,7 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                             alamat: "Transjakarta Busway Koridor 10, 12, RW 06, Kebon Bawang, Tanjung Priok, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14320, Indonesia",
                             state: "",
                             provinsi: "Daerah Khusus Jakarta",
-                            aktivitas: getRandomActivity(),
+                            aktivitas: getRandomActivityL2(),
                         },
                     });
                 }
@@ -266,7 +266,133 @@ exports.generateSchedulersPreview = async (req, res, next) => {
                             alamat: "Transjakarta Busway Koridor 10, 12, RW 06, Kebon Bawang, Tanjung Priok, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14320, Indonesia",
                             state: "",
                             provinsi: "Daerah Khusus Jakarta",
-                            aktivitas: getRandomActivity(),
+                            aktivitas: getRandomActivityL2(),
+                        },
+                    });
+                }
+            }
+        }
+
+        if (String(position).toUpperCase() === "L1") {
+            const shiftPeriods = schedule.data.values[0];
+            const dateOfShifts = date.data.values[0];
+
+            for (let i = 0; i < shiftPeriods.length; i++) {
+                const shift = shiftPeriods[i];
+                const date = dateOfShifts[i];
+                const dateObj = new Date();
+                dateObj.setDate(date);
+
+                if (String(shift).toUpperCase() == "S2") {
+                    const minutes = getRandomMinutes(randomMaxTime);
+
+                    const waktuAbsenMasuk = new Date(
+                        year,
+                        month,
+                        date,
+                        20,
+                        minutes,
+                        0
+                    );
+
+                    const waktuAbsenPulang = new Date();
+                    waktuAbsenPulang.setDate(waktuAbsenMasuk.getDate() + 1);
+                    waktuAbsenPulang.setHours(8);
+                    waktuAbsenPulang.setMinutes(minutes);
+
+                    // console.log(
+                    //     `Absen Masuk S2: WITEL - APRIL ${date} 2024 Pukul 8 Malam`
+                    // );
+
+                    schedulers.push({
+                        keterangan_absen: "absen_masuk",
+                        lokasi_absen: "WITEL",
+                        tanggal_absen: waktuAbsenMasuk,
+                        data: {
+                            via: "WFO",
+                            kondisi: "Sehat",
+                            lokasi: "-6.117492, 106.893084",
+                            alamat: "Transjakarta Busway Koridor 10, 12, RW 06, Kebon Bawang, Tanjung Priok, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14320, Indonesia",
+                            state: "",
+                            provinsi: "Daerah Khusus Jakarta",
+                        },
+                    });
+
+                    // console.log(
+                    //     `Absen Pulang S2: WITEL - APRIL ${
+                    //         Number(date) + 1
+                    //     } 2024 Pukul 8 Pagi`
+                    // );
+
+                    schedulers.push({
+                        keterangan_absen: "absen_pulang",
+                        lokasi_absen: "WITEL",
+                        tanggal_absen: waktuAbsenPulang,
+                        data: {
+                            via: "WFO",
+                            kondisi: "Sehat",
+                            lokasi: "-6.117492, 106.893084",
+                            alamat: "Transjakarta Busway Koridor 10, 12, RW 06, Kebon Bawang, Tanjung Priok, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14320, Indonesia",
+                            state: "",
+                            provinsi: "Daerah Khusus Jakarta",
+                            aktivitas: getRandomActivityL1(),
+                        },
+                    });
+                }
+
+                if (String(shift).toUpperCase() == "S1") {
+                    const minutes = getRandomMinutes(randomMaxTime);
+
+                    const waktuAbsenMasuk = new Date(
+                        year,
+                        month,
+                        date,
+                        8,
+                        minutes,
+                        0
+                    );
+                    const waktuAbsenPulang = new Date(
+                        year,
+                        month,
+                        date,
+                        20,
+                        minutes,
+                        0
+                    );
+                    // console.log(
+                    //     `Absen Masuk S1: SMR - APRIL ${date} 2024 Pukul 8 Pagi`
+                    // );
+                    schedulers.push({
+                        keterangan_absen: "absen_masuk",
+                        lokasi_absen: "WITEL",
+                        tanggal_absen: waktuAbsenMasuk,
+                        data: {
+                            via: "WFO",
+                            kondisi: "Sehat",
+                            lokasi: "-6.117492, 106.893084",
+                            alamat: "Transjakarta Busway Koridor 10, 12, RW 06, Kebon Bawang, Tanjung Priok, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14320, Indonesia",
+                            state: "",
+                            provinsi: "Daerah Khusus Jakarta",
+                        },
+                    });
+
+                    // console.log(
+                    //     `Absen Pulang S1: WITEL - APRIL ${Number(
+                    //         date
+                    //     )} 2024 Pukul 8 Malam`
+                    // );
+                    schedulers.push({
+                        keterangan_absen: "absen_pulang",
+                        lokasi_absen: "WITEL",
+                        tanggal_absen: waktuAbsenPulang,
+                        data: {
+                            via: "WFO",
+                            kondisi: "Sehat",
+                            lokasi: "-6.117492, 106.893084",
+                            alamat: "Transjakarta Busway Koridor 10, 12, RW 06, Kebon Bawang, Tanjung Priok, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14320, Indonesia",
+                            state: "",
+                            provinsi: "Daerah Khusus Jakarta",
+                            aktivitas: getRandomActivityL1(),
                         },
                     });
                 }
@@ -288,6 +414,7 @@ exports.generateSchedulersPreview = async (req, res, next) => {
 };
 
 exports.setSchedulers = async (req, res, next) => {
+    console.log("WORK");
     try {
         const { schedule } = req.body;
         const currentDate = new Date();
@@ -432,13 +559,28 @@ function convertMonthToNumber(monthName) {
     }
 }
 
-function getRandomActivity() {
+function getRandomActivityL2() {
     const activities = [
         "Solving Ticket",
         "Update Database",
         "Update Data",
         "Solving Ticket dan update data",
         "Respond to user inquiries",
+        "Provide technical assistance to users",
+        "Monitor system performance",
+        "Support processes",
+    ];
+    const randIndex = Math.floor(Math.random() * activities.length);
+    return activities[randIndex];
+}
+
+function getRandomActivityL1() {
+    const activities = [
+        "Solving Ticket",
+        "Solving Ticket dan update data",
+        "Respond to user inquiries",
+        "Respond to user problem",
+        "Guide user to solve problem",
         "Provide technical assistance to users",
         "Monitor system performance",
         "Support processes",

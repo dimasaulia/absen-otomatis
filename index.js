@@ -9,7 +9,8 @@ async function StartScheduler() {
 
 StartScheduler().finally(() => {
     console.log("Wakeuping scheduler finish");
-    app.listen(8000, () => {
-        console.log(`🚀 SERVER RUNNING IN PORT ${8000}`);
-    });
+});
+
+app.listen(8000, () => {
+    console.log(`🚀 SERVER RUNNING IN PORT ${8000}`);
 });
