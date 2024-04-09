@@ -9,10 +9,14 @@ class Scheduler {
      * @param {Function} fn `fn` Function to execute at the specified time.
      * @returns {String} Returns a string ID that can be use to cancel the task.
      */
-    static setTask = function (date, fn) {
-        console.log("Scheduler Get Date of", date);
-        console.log("Scheduler ISO Time", new Date(date).toISOString());
-        const id = crypto.randomUUID();
+    static setTask = function (date, fn, taskId = null) {
+        // console.log("Scheduler Get Date of", date);
+        // console.log("Scheduler ISO Time", new Date(date).toISOString());
+
+        let id = taskId;
+        if (id == null) {
+            id = crypto.randomUUID();
+        }
         if (typeof fn !== "function") {
             throw new Error("expected second argument to be a function");
         }
@@ -22,6 +26,12 @@ class Scheduler {
         var ms = date - now;
         var timer = setTimeout(fn, ms);
         Scheduler.#SCHEDULER_LIST[id] = { timer: timer };
+
+        console.log(
+            `New scheduler with id ${id} set to run on ${new Date(
+                date
+            ).toISOString()}`
+        );
         return id;
     };
 

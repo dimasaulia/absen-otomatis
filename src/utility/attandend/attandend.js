@@ -17,21 +17,22 @@ async function userDoLogin(data) {
     return [isSuccessfullyLogin, response.headers.raw()["set-cookie"]];
 }
 
-async function userDoAttandend(attandendType, data) {
+async function userDoAttandend({ attandendType, attandendData, loginData }) {
     console.log("Executing Attandend Proccess");
     if (!["absen_masuk", "absen_pulang"].includes(attandendType)) {
         console.log("Pilihan metode absen tidak tersedia");
         return new Error("Pilihan metode absen tidak tersedia");
     }
 
-    const [isLoginSuccess, cookies] = await userDoLogin({
-        username: "11002818",
-        password: "Dimasilcs1!",
-    });
+    const [isLoginSuccess, cookies] = await userDoLogin(loginData);
 
     if (isLoginSuccess) {
         const url = `https://eoffice.ilcs.co.id/p2b/absensi/${attandendType}`;
-        const response = await httpRequest({ url, body: data, cookies });
+        const response = await httpRequest({
+            url,
+            body: attandendData,
+            cookies,
+        });
         console.log(response);
     } else {
         console.log("LOGIN GAGAL");

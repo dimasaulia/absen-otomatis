@@ -7,6 +7,8 @@ const { userDoAttandend } = require("../../../../utility/attandend/attandend");
 const {
     resSuccess,
 } = require("../../../../utility/response-handlers/success/response-success");
+const prisma = require("../../../../providers/database/client");
+const { decryptText } = require("../../../../utility/encription/encription");
 
 exports.rosterPageList = async (req, res, next) => {
     try {
@@ -289,36 +291,71 @@ exports.setSchedulers = async (req, res, next) => {
     try {
         const { schedule } = req.body;
         const currentDate = new Date();
+        const bulkData = [];
+        const responseData = [];
+        const userData = await prisma.user.findUnique({
+            where: { id: req.userId },
+        });
+
+        if (userData == null || userData == undefined) {
+            throw new Error(
+                "Cant find user, maybe user was remove from system"
+            );
+        }
+
         for (let i = 0; i < schedule.length; i++) {
             const scheduleData = schedule[i];
             const scheduleDatetime = new Date(scheduleData.tanggal_absen);
             const attandendType = scheduleData.keterangan_absen;
             const schedulePayload = scheduleData.data;
 
-            console.log(
-                scheduleDatetime,
-                currentDate,
-                scheduleDatetime > currentDate
-            );
             if (scheduleDatetime > currentDate) {
-                const scheduleId = Scheduler.setTask(
-                    scheduleDatetime,
-                    async () => {
-                        userDoAttandend(attandendType, schedulePayload);
-                    }
-                );
-                console.log(
-                    `New scheduler with id ${scheduleId} set to run on ${scheduleDatetime}`
-                );
+                const taskId = Scheduler.setTask(scheduleDatetime, async () => {
+                    userDoAttandend({
+                        attandendType: attandendType,
+                        attandendData: schedulePayload,
+                        loginData: {
+                            username: userData.eofficeUsername,
+                            passowrd: decryptText(userData.eofficePassword),
+                        },
+                    });
+                });
+
+                bulkData.push({
+                    task_data: scheduleData,
+                    task_id: taskId,
+                    task_time: scheduleDatetime,
+                    userId: userData.id,
+                });
+
+                responseData.push({
+                    task_id: taskId,
+                    task_time: scheduleDatetime,
+                });
             }
         }
+
+        // Hapus scheduler milik user yang sedang login dan spesific
+        await prisma.$queryRawUnsafe(
+            `
+        DELETE FROM "Scheduler" s 
+        WHERE s."userId" = $1 AND
+        EXTRACT(MONTH FROM s.task_time) = EXTRACT(MONTH FROM CURRENT_DATE) 
+        AND EXTRACT(YEAR FROM s.task_time) = EXTRACT(YEAR FROM CURRENT_DATE)`,
+            userData.id
+        );
+
+        await prisma.scheduler.createMany({ data: bulkData });
 
         return resSuccess({
             res,
             title: "Success creating scheduler",
+            data: responseData,
         });
     } catch (error) {
         next(error);
+    } finally {
+        await prisma.$disconnect();
     }
 };
 
