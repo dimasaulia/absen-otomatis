@@ -8,7 +8,7 @@ async function StartScheduler() {
 }
 
 StartScheduler().finally(() => {
-    console.log("Wakeuping scheduler finish");
+    console.log("Wake up scheduling is complete");
 });
 
 app.listen(8000, () => {

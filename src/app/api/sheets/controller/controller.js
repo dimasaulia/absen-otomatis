@@ -414,7 +414,7 @@ exports.generateSchedulersPreview = async (req, res, next) => {
 };
 
 exports.setSchedulers = async (req, res, next) => {
-    console.log("WORK");
+    console.log("Set Schedulers Function");
     try {
         const { schedule } = req.body;
         const currentDate = new Date();
@@ -443,7 +443,7 @@ exports.setSchedulers = async (req, res, next) => {
                         attandendData: schedulePayload,
                         loginData: {
                             username: userData.eofficeUsername,
-                            passowrd: decryptText(userData.eofficePassword),
+                            password: decryptText(userData.eofficePassword),
                         },
                     });
                 });
@@ -514,7 +514,7 @@ exports.wakeUpSchedulers = async () => {
                         attandendData: schedulePayload,
                         loginData: {
                             username: eofficeUsername,
-                            passowrd: decryptText(eofficePassword),
+                            password: decryptText(eofficePassword),
                         },
                     });
                 });
