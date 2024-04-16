@@ -430,6 +430,19 @@ exports.setSchedulers = async (req, res, next) => {
             );
         }
 
+        // Remove Esisting Task
+        const existingTask = await prisma.$queryRaw`
+            SELECT * FROM "Scheduler" s WHERE 
+            EXTRACT(MONTH FROM s.task_time) = EXTRACT(MONTH FROM CURRENT_DATE) 
+            AND EXTRACT(YEAR FROM s.task_time) = EXTRACT(YEAR FROM CURRENT_DATE)
+            AND s."userId" = ${userData.id}
+        `;
+
+        for (const key in existingTask) {
+            const task = existingTask[key];
+            Scheduler.removeTask(task.task_id);
+        }
+
         for (let i = 0; i < schedule.length; i++) {
             const scheduleData = schedule[i];
             const scheduleDatetime = new Date(scheduleData.tanggal_absen);
@@ -508,16 +521,20 @@ exports.wakeUpSchedulers = async () => {
             const eofficePassword = data[i].task_data.eofficePassword;
 
             if (scheduleDatetime > currentDate) {
-                Scheduler.setTask(scheduleDatetime, async () => {
-                    userDoAttandend({
-                        attandendType: attandendType,
-                        attandendData: schedulePayload,
-                        loginData: {
-                            username: eofficeUsername,
-                            password: decryptText(eofficePassword),
-                        },
-                    });
-                });
+                Scheduler.setTask(
+                    scheduleDatetime,
+                    async () => {
+                        userDoAttandend({
+                            attandendType: attandendType,
+                            attandendData: schedulePayload,
+                            loginData: {
+                                username: eofficeUsername,
+                                password: decryptText(eofficePassword),
+                            },
+                        });
+                    },
+                    data[i].task_id
+                );
             }
         }
     } catch (error) {
