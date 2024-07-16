@@ -57,7 +57,7 @@ exports.generateSchedulersPreview = async (req, res, next) => {
         personnel_number,
         personnel_name,
         tab_name: tabName,
-        random_max_time: randomMaxTime = 8,
+        random_max_time: randomMaxTime = 5,
     } = req.body;
 
     const personnelRow = Number(personnel_number) + 3;
@@ -82,6 +82,62 @@ exports.generateSchedulersPreview = async (req, res, next) => {
 
         const position = personnel.data.values[0][2];
 
+        // Handel L2OH
+        if (String(position).toUpperCase() === "OH") {
+            const shiftPeriods = schedule.data.values[0];
+            const dateOfShifts = date.data.values[0];
+
+            for (let i = 0; i < shiftPeriods.length; i++) {
+                const shift = shiftPeriods[i];
+                const date = dateOfShifts[i];
+                const dateObj = new Date();
+                dateObj.setDate(date);
+
+                if (String(shift).toUpperCase() == "OH") {
+                    const minutes = getRandomMinutes(randomMaxTime);
+
+                    const waktuAbsenMasuk = new Date(
+                        year,
+                        month,
+                        date,
+                        20,
+                        minutes,
+                        0
+                    );
+
+                    const waktuAbsenPulang = new Date();
+                    waktuAbsenPulang.setDate(waktuAbsenMasuk.getDate() + 1);
+                    waktuAbsenPulang.setHours(8);
+                    waktuAbsenPulang.setMinutes(minutes);
+
+                    // console.log(
+                    //     `Absen Masuk S2: WITEL - APRIL ${date} 2024 Pukul 8 Malam`
+                    // );
+
+                    schedulers.push({
+                        keterangan_absen: "absen_masuk",
+                        lokasi_absen: "BELLA TERRA",
+                        tanggal_absen: waktuAbsenMasuk,
+                        data: generateRandomLocationBellaTerra(""),
+                    });
+
+                    // console.log(
+                    //     `Absen Pulang S2: WITEL - APRIL ${
+                    //         Number(date) + 1
+                    //     } 2024 Pukul 8 Pagi`
+                    // );
+
+                    schedulers.push({
+                        keterangan_absen: "absen_pulang",
+                        lokasi_absen: "BELLA TERRA",
+                        tanggal_absen: waktuAbsenPulang,
+                        data: generateRandomLocationBellaTerra(getRandomActivityL2()),
+                    });
+                }
+            }
+        }
+
+        // Handel L2
         if (String(position).toUpperCase() === "L2") {
             const shiftPeriods = schedule.data.values[0];
             const dateOfShifts = date.data.values[0];
@@ -413,6 +469,65 @@ exports.generateSchedulersPreview = async (req, res, next) => {
     }
 };
 
+exports.generateSchedulersOHPreview = async (req, res, next) => {
+    try {
+        const {
+            random_max_time: randomMaxTime = 5,
+        } = req.body;
+    
+        const schedulers = [];
+        for (let i  = 1; i <= getMaxDateOfCurrentMonth(); i++) {
+            const minutes = getRandomMinutes(randomMaxTime);
+            const now = new Date();
+            const year = now.getFullYear(); // Mengambil tanggal
+            const month = now.getMonth();
+
+            const waktuAbsenMasuk = new Date(
+                year,
+                month,
+                i,
+                8,
+                minutes,
+                0
+            );
+            const waktuAbsenPulang = new Date(
+                2024,
+                6,
+                i,
+                20,
+                minutes,
+                0
+            );
+
+
+            schedulers.push({
+                keterangan_absen: "absen_masuk",
+                lokasi_absen: "BELLA TERRA",
+                tanggal_absen: waktuAbsenMasuk,
+                data: generateRandomLocationBellaTerra(""),
+            });
+
+            schedulers.push({
+                keterangan_absen: "absen_pulang",
+                lokasi_absen: "BELLA TERRA",
+                tanggal_absen: waktuAbsenPulang,
+                data: generateRandomLocationBellaTerra(getRandomActivityL2()),
+            });
+        }
+
+        return resSuccess({
+            res,
+            title: "Success creating scheduler preview",
+            data: {
+                schedulers: schedulers,
+            },
+        });
+    } catch (error) {
+        next(error);
+        
+    }
+}
+
 exports.setSchedulers = async (req, res, next) => {
     console.log("Set Schedulers Function");
     try {
@@ -504,6 +619,10 @@ exports.setSchedulers = async (req, res, next) => {
     }
 };
 
+exports.setOfficeHourSchedulers = async (req, res, next) => {
+
+}
+
 exports.wakeUpSchedulers = async () => {
     try {
         const data = await prisma.$queryRaw`
@@ -581,6 +700,8 @@ function getRandomActivityL2() {
         "Solving Ticket",
         "Update Database",
         "Update Data",
+        "Bug Fixing",
+        "Bug Tracing",
         "Solving Ticket dan update data",
         "Respond to user inquiries",
         "Provide technical assistance to users",
@@ -612,4 +733,42 @@ function getRandomMinutes(max) {
     }
     const randomMinutes = Math.floor(Math.random() * (max + 1));
     return randomMinutes;
+}
+
+function generateRandomLocationBellaTerra(activity) {
+    const latitude = -6.174241140255721;
+    const longitude = 106.89389786274027;
+    
+    // Acak 4 digit terakhir untuk latitude dan longitude
+    const randomize = (value) => {
+        const base = Math.floor(value * 10000);
+        const randomized = base + Math.floor(Math.random() * 10000) / 10000;
+        return randomized.toFixed(14); // Mengembalikan dengan 14 digit presisi
+    };
+
+    const randomLatitude = randomize(latitude);
+    const randomLongitude = randomize(longitude);
+
+    return {
+        via: "WFS",
+        kondisi: "Sehat",
+        lokasi: `${randomLatitude}.${randomLongitude}`,
+        alamat: "Jalan Kirana Avenue, RW 01, Kelapa Gading Timur, Kelapa Gading, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14240, Indonesia",
+        state: "Kelapa Gading Timur",
+        provinsi: "Daerah Khusus Jakarta",
+        keterangan: activity ?? "",
+    };
+}
+
+function getMaxDateOfCurrentMonth() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth(); // Bulan saat ini (0-11)
+
+    // Buat tanggal untuk tanggal 1 bulan berikutnya
+    const nextMonth = new Date(year, month + 1, 1);
+    // Kurangi satu hari dari tanggal tersebut
+    const maxDate = new Date(nextMonth - 1);
+
+    return maxDate.getDate();
 }
