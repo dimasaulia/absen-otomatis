@@ -752,11 +752,12 @@ function generateRandomLocationBellaTerra(activity) {
     return {
         via: "WFS",
         kondisi: "Sehat",
-        lokasi: `${randomLatitude}.${randomLongitude}`,
+        lokasi: `${randomLatitude},${randomLongitude}`,
         alamat: "Jalan Kirana Avenue, RW 01, Kelapa Gading Timur, Kelapa Gading, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14240, Indonesia",
         state: "Kelapa Gading Timur",
         provinsi: "Daerah Khusus Jakarta",
-        keterangan: activity ?? "",
+        keterangan: "",
+        aktivitas: activity ?? "",
     };
 }
 
