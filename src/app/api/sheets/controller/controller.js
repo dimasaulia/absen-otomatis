@@ -436,20 +436,22 @@ exports.generateSchedulersOHPreview = async (req, res, next) => {
 
       schedulers.push({
         keterangan_absen: 'absen_masuk',
-        lokasi_absen: 'BELLA TERRA',
+        lokasi_absen: 'TAMANSARI PRAMA',
         tanggal_absen: waktuAbsenMasuk,
-        data: generateRandomLocationBellaTerra(''),
+        data: generateRandomLocationTamansariPrama(''),
       });
 
       schedulers.push({
         keterangan_absen: 'absen_pulang',
-        lokasi_absen: 'BELLA TERRA',
+        lokasi_absen: 'TAMANSARI PRAMA',
         tanggal_absen: waktuAbsenPulang,
-        data: generateRandomLocationBellaTerra(
+        data: generateRandomLocationTamansariPrama(
           String(position).toUpperCase() === 'L2'
             ? getRandomActivityL2()
             : String(position).toUpperCase() === 'DEV'
             ? getRandomActivityDEV()
+            : String(position).toUpperCase() === 'QA'
+            ? getRandomActivityQa()
             : getRandomActivityL2()
         ),
       });
@@ -679,6 +681,23 @@ function getRandomActivityL1() {
   return activities[randIndex];
 }
 
+function getRandomActivityQa() {
+  const activities = [
+    'Testing task Enhancement di Sprint',
+    'Testing task BUGFIX di Sprint',
+    'Testing task NEW FEATURE di Sprint',
+    'Testing task Enhancement di Sprint',
+    'Testing task BUGFIX di Adhoc',
+    'Testing task NEW FEATURE di Adhoc',
+    'Testing task BUGFIX di Hotfix',
+    'Membuat Skenario yg ada di Sprint',
+    'Membuat Skenario yg ada di Adhoc',
+    'Membuat Skenario yg ada di Hotfix',
+  ];
+  const randIndex = Math.floor(Math.random() * activities.length);
+  return activities[randIndex];
+}
+
 function getRandomMinutes(min = 0, max = 5) {
   if (min > max) {
     throw new Error(
@@ -691,7 +710,7 @@ function getRandomMinutes(min = 0, max = 5) {
 
 function generateRandomLocationBellaTerra(activity) {
   const randomLocationId = Math.floor(Math.random() * 50);
-  const randomLocation = randomLocations[randomLocationId];
+  const randomLocation = randomLocationsBellaTerra[randomLocationId];
 
   return {
     via: 'WFS',
@@ -701,6 +720,23 @@ function generateRandomLocationBellaTerra(activity) {
       'Jalan Kirana Avenue, RW 01, Kelapa Gading Timur, Kelapa Gading, Jakarta Utara, Daerah Khusus Jakarta, Jawa, 14240, Indonesia',
     state: 'Kelapa Gading Timur',
     provinsi: 'Daerah Khusus Jakarta',
+    keterangan: '',
+    aktivitas: activity ?? '',
+  };
+}
+
+function generateRandomLocationTamansariPrama(activity) {
+  const randomLocationId = Math.floor(Math.random() * 50);
+  const randomLocation = randomLocationsTamansariPrama[randomLocationId];
+
+  return {
+    via: 'WFS',
+    kondisi: 'Sehat',
+    lokasi: randomLocation,
+    alamat:
+      'Bank Central Asia, Jalan KH. Wahid Hasyim, RW 04, Gondangdia, Menteng, Jakarta Pusat, Daerah Khusus Ibukota Jakarta, Jawa, 10350, Indonesia',
+    state: 'Gondangdia',
+    provinsi: 'Daerah Khusus Ibukota Jakarta',
     keterangan: '',
     aktivitas: activity ?? '',
   };
@@ -719,7 +755,7 @@ function getMaxDateOfCurrentMonth() {
   return maxDate.getDate();
 }
 
-const randomLocations = [
+const randomLocationsBellaTerra = [
   '-6.174241140255721,106.893897862740270',
   '-6.174241140255721,106.893897862740273',
   '-6.174241140255721,106.893897862740276',
@@ -771,4 +807,57 @@ const randomLocations = [
   '-6.174241140255721,106.893897862740414',
   '-6.174241140255721,106.893897862740417',
   '-6.174242808460579,106.893899747491371',
+];
+
+const randomLocationsTamansariPrama = [
+  '-6.186946101527,106.827664375305',
+  '-6.186946873521,106.827664985412',
+  '-6.186946201836,106.827664292837',
+  '-6.186946998221,106.827664517964',
+  '-6.186946579421,106.827664153674',
+  '-6.186946452738,106.827664879120',
+  '-6.186946302184,106.827664721098',
+  '-6.186946843205,106.827664943702',
+  '-6.186946665124,106.827664381029',
+  '-6.186946193487,106.827664527891',
+  '-6.186946384712,106.827664982374',
+  '-6.186946258947,106.827664603918',
+  '-6.186946907215,106.827664205109',
+  '-6.186946832574,106.827664756103',
+  '-6.186946154381,106.827664487192',
+  '-6.186946876509,106.827664341203',
+  '-6.186946402193,106.827664901876',
+  '-6.186946211658,106.827664782130',
+  '-6.186946753624,106.827664519607',
+  '-6.186946596318,106.827664130984',
+  '-6.186946307458,106.827664372518',
+  '-6.186946479283,106.827664893104',
+  '-6.186946639478,106.827664412958',
+  '-6.186946155379,106.827664519470',
+  '-6.186946891270,106.827664830124',
+  '-6.186946743028,106.827664725193',
+  '-6.186946394165,106.827664381759',
+  '-6.186946239876,106.827664593127',
+  '-6.186946914782,106.827664409283',
+  '-6.186946531287,106.827664902183',
+  '-6.186946281392,106.827664157023',
+  '-6.186946673291,106.827664584203',
+  '-6.186946817635,106.827664327891',
+  '-6.186946543217,106.827664475091',
+  '-6.186946298547,106.827664803092',
+  '-6.186946105823,106.827664948382',
+  '-6.186946402919,106.827664681204',
+  '-6.186946739581,106.827664527398',
+  '-6.186946186273,106.827664931718',
+  '-6.186946532765,106.827664248093',
+  '-6.186946314675,106.827664985371',
+  '-6.186946709413,106.827664352479',
+  '-6.186946825731,106.827664193842',
+  '-6.186946293641,106.827664983102',
+  '-6.186946452879,106.827664310527',
+  '-6.186946378195,106.827664710391',
+  '-6.186946792618,106.827664132978',
+  '-6.186946902741,106.827664873095',
+  '-6.186946157439,106.827664420874',
+  '-6.186946619528,106.827664791208',
 ];
