@@ -424,6 +424,8 @@ exports.generateSchedulersOHPreview = async (req, res, next) => {
       position = 'L2',
     } = req.body;
 
+    const location = 'BELLA TERRA';
+
     const schedulers = [];
     for (let i = 1; i <= getMaxDateOfCurrentMonth(); i++) {
       const minutes = getRandomMinutes(randomMinTime, randomMaxTime);
@@ -436,16 +438,16 @@ exports.generateSchedulersOHPreview = async (req, res, next) => {
 
       schedulers.push({
         keterangan_absen: 'absen_masuk',
-        lokasi_absen: 'TAMANSARI PRAMA',
+        lokasi_absen: location,
         tanggal_absen: waktuAbsenMasuk,
-        data: generateRandomLocationTamansariPrama(''),
+        data: generateRandomLocationBellaTerra(''),
       });
 
       schedulers.push({
         keterangan_absen: 'absen_pulang',
-        lokasi_absen: 'TAMANSARI PRAMA',
+        lokasi_absen: location,
         tanggal_absen: waktuAbsenPulang,
-        data: generateRandomLocationTamansariPrama(
+        data: generateRandomLocationBellaTerra(
           String(position).toUpperCase() === 'L2'
             ? getRandomActivityL2()
             : String(position).toUpperCase() === 'DEV'
